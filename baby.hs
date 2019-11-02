@@ -77,6 +77,10 @@ head' :: [a] -> a
 head' [] = error "Can't call head on an empty list, dummy!"
 head' (x:_) = x
 
+tail' :: [a] -> [a]
+tail' [] = []
+tail' (_:xs) = xs
+
 tell :: (Show a) => [a] -> String
 tell [] = "The list is empty"
 tell (x:[]) = "The list has one element: " ++ show x
@@ -91,8 +95,106 @@ sum' :: (Num a) => [a] -> a
 sum' [] = 0
 sum' (x:xs) = x + sum' xs
 
+capital :: String -> String
+capital "" = "Empty string"
+capital all@(x:xs) =
+    "The first letter of " ++ all ++ " is " ++ [x]
+
+bmiTell :: (RealFloat a) => a -> a -> String
+bmiTell weight height
+    | bmi <= under = "Underweight"
+    | bmi <= mid   = "Midweight"
+    | bmi <= over  = "Overweight"
+    | True         = "Obese"
+    where   bmi = weight / height ^ 2
+            (under, mid, over) = (18.5, 25.0, 30.0)
+
+max' :: (Ord a) => a -> a -> a
+max' a b
+    | a > b = a
+    | True  = b
+
+myCompare :: (Ord a) => a -> a -> Ordering
+myCompare a b
+    | a > b  = GT
+    | a == b = EQ
+    | True   = LT
+
+initials :: String -> String -> String
+initials firstname lastname = [f] ++ ". " ++ [l] ++ "."
+    where   (f:_) = firstname
+            (l:_) = lastname
+
+calcBmis :: (RealFloat a) => [(a,a)] -> [a]
+--calcBmis xs = [bmi w h | (w,h) <- xs]
+--    where bmi weight height = weight / height ^ 2
+calcBmis xs = [bmi|(w,h)<-xs,let bmi=w/h^2,bmi>=25.0]
+
+cylinder :: (RealFloat a) => a -> a -> a
+cylinder r h =
+    let sideArea = 2 * pi * r * h
+        topArea = pi * r ^ 2
+    in  sideArea + 2 * topArea
+
+head'' :: [a] -> a
+head'' xs = case xs of [] -> error "undefined for empty list"
+                      (x:_) -> x
+
+describeList :: [a] -> String
+describeList xs =
+    "The list is "++case xs of []  -> "empty"
+                               [x] -> "singleton"
+                               xs  -> "multi-element"
+
+maximum' :: (Ord a) => [a] -> a
+maximum' [] = error "maximum of empty list"
+maximum' [x] = x
+maximum' (x:xs) = max x (maximum' xs)
+--    | x > maxTail = x
+--    | True        = maxTail
+--    where maxTail = maximum' xs
+
+replicate' :: (Num i, Ord i) => i -> a -> [a]
+replicate' n x
+    | n <= 0 = []
+    | True   = x:replicate' (n-1) x
+
+take' :: (Num i, Ord i) => i -> [a] -> [a]
+take' n _
+    | n <= 0 = []
+take' _ [] = []
+take' n (x:xs) = x : take' (n-1) xs
+
+reverse' :: [a] -> [a]
+reverse' [] = []
+reverse' (x:xs) = reverse' xs ++ [x]
+
+repeat' :: a -> [a]
+repeat' x = x:repeat' x
+
+zip' :: [a] -> [b] -> [(a,b)]
+zip' _ [] = []
+zip' [] _ = []
+zip' (x:xs) (y:ys) = (x,y):zip' xs ys
+
+elem' :: (Eq a) => a -> [a] -> Bool
+elem' _ [] = False
+elem' a (x:xs)
+    | a == x = True
+    | True   = elem' a xs
+
+-- quicksort :: (Ord a) => [a] -> [a]
+-- quicksort [] = []
+-- quicksort (x:xs) =
+--     let smaller = quicksort (filter (<=x) xs)
+--         bigger  = quicksort (filter (> x) xs)
+--     in smaller ++ [x] ++ bigger
+
 multThree :: (Num a) => a -> a -> a -> a
-multThree x y z = x * y * z 
+multThree x y z = x * y * z
+
+compareWithHundred :: (Num a, Ord a) => a -> Ordering
+compareWithHundred = compare 100
 
 divideByTen :: (Floating a) => a -> a
 divideByTen = (/10)
@@ -132,6 +234,15 @@ largestDivisible :: (Integral a) => a
 largestDivisible = head (filter p [100000,99999..])
     where p x = mod x 3829 == 0
 
+chain :: (Integral a ) => a -> [a]
+chain 1 = [1]
+chain n
+    | even n = n:chain (div n 2)
+    | odd n  = n:chain (n*3 + 1)
+
+numLongChains :: Int
+numLongChains = length (filter (\xs -> length xs > 15) (map chain [1..100]))
+
 sumv2 :: (Num a) => [a] -> a
 sumv2 = foldl (+) 0
 
@@ -164,6 +275,9 @@ headv2 = foldr1 (\x _ -> x)
 
 last' :: [a] -> a
 last' = foldl1 (\_ x -> x)
+
+sqrtSums :: Int
+sqrtSums = length (takeWhile (<1000) (scanl1 (+) (map sqrt [1..]))) + 1
 
 numUniques :: (Eq a) => [a] -> Int
 numUniques = length . nub
@@ -206,3 +320,29 @@ phoneBookToMap xs = Map.fromListWith (++) $ map (\(k,v) -> (k,[v])) xs
 text1 = "I just had an anime dream. Anime... Reality... Are they so different?"
 text2 = "The old man left his garbage can out and now his trash is all over my lawn!"
 
+search :: (Eq a) => [a] -> [a] -> Bool
+search needle haystack =
+    let nlen = length needle
+    in foldl (\acc x -> if take nlen x == needle then True else acc) False (tails haystack)
+
+encode :: Int -> String -> String
+encode shift msg =
+    let ords = map ord msg
+        shifted = map (+ shift) ords
+    in  map chr shifted
+
+decode :: Int -> String -> String
+decode shift msg = encode (negate shift) msg
+
+phoneBook =
+    [("betty","555-2938")
+    ,("bonnie","452-2928")
+    ,("patsy","493-2928")
+    ]
+
+findKey :: (Eq k) => k -> [(k,v)] -> Maybe v
+findKey key =
+    foldr (\(k,v) acc ->
+        if key == k
+        then Just v
+        else acc) Nothing
