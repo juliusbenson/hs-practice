@@ -138,7 +138,7 @@ cylinder r h =
 
 head'' :: [a] -> a
 head'' xs = case xs of [] -> error "undefined for empty list"
-                      (x:_) -> x
+                       (x:_) -> x
 
 describeList :: [a] -> String
 describeList xs =
@@ -246,8 +246,8 @@ numLongChains = length (filter (\xs -> length xs > 15) (map chain [1..100]))
 sumv2 :: (Num a) => [a] -> a
 sumv2 = foldl (+) 0
 
-elem' :: (Eq a) => a -> [a] -> Bool
-elem' y ys = foldl (\acc x -> if x == y then True else acc) False ys
+elem'' :: (Eq a) => a -> [a] -> Bool
+elem'' y ys = foldl (\acc x -> if x == y then True else acc) False ys
 
 mapv2 :: (a -> b) -> [a] -> [b]
 mapv2 f xs = foldr (\x acc -> f x : acc) [] xs
@@ -258,11 +258,11 @@ mapv3 f xs = foldl (\acc x -> acc ++ [f x]) [] xs
 sumv3 :: (Num a) => [a] -> a
 sumv3 = foldl1 (+)
 
-maximum' :: (Ord a) => [a] -> a
-maximum' = foldr1 (\x acc -> if x > acc then x else acc)
+maximum'' :: (Ord a) => [a] -> a
+maximum'' = foldr1 (\x acc -> if x > acc then x else acc)
 
-reverse' :: [a] -> [a]
-reverse' = foldl (flip (:)) []
+reverse'' :: [a] -> [a]
+reverse'' = foldl (flip (:)) []
 
 product' :: (Num a) => [a] -> a
 product' = foldr1 (*)
