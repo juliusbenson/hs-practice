@@ -4,6 +4,7 @@ import Data.List
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import Geometry
+import System.IO
 
 data Point = Point Float Float deriving (Show)
 data Shape = Circle Point Float | Rectangle Point Point deriving (Show)
@@ -507,3 +508,9 @@ treeElem x (Node a left right)
 yesnoif :: (YesNo y) => y -> a -> a -> a
 yesnoif yesnoval yesresult noresult = if yesno yesnoval then yesresult else noresult
 
+withFile' :: FilePath -> IOMode -> (Handle -> IO a) -> IO a
+withFile' path mode f = do
+    handle <- openFile path mode
+    result <- f handle
+    hClose handle
+    return result
