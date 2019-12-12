@@ -526,10 +526,21 @@ threeCoins gen =
 randoms' :: (RandomGen g, Random a) => g -> [a]
 randoms' gen = let (value, newGen) = random gen in value:randoms' newGen
 
-finiteRandoms :: (RandomGen g, Random a, Num n) => n -> g -> ([a], g)
-finiteRandoms 0 gen = ([], gen)
-finiteRandoms n gen =
-    let (value, newGen) = random gen
-        (xs, finalGen) = finiteRandoms (n-1) newGen
-    in  (value:xs, finalGen)
+-- finiteRandoms :: (RandomGen g, Random a, Num n) => n -> g -> ([a], g)
+-- finiteRandoms 0 gen = ([], gen)
+-- finiteRandoms n gen =
+--     let (value, newGen) = random gen
+--         (xs, finalGen) = finiteRandoms (n-1) newGen
+--     in  (value:xs, finalGen)
+
+solveRPN :: String -> Float
+solveRPN = head . foldl foldFx [] . words
+    where   foldFx (x:y:ys) "*" = (x * y):ys
+            foldFx (x:y:ys) "+" = (x + y):ys
+            foldFx (x:y:ys) "-" = (y - x):ys
+            foldFx (x:y:ys) "/" = (y / x):ys
+            foldFx (x:y:ys) "^" = (y ** x):ys
+            foldFx (x:xs) "ln" = log x:xs
+            foldFx xs "sum" = [sum xs]
+            foldFx xs item = read item:xs
 
