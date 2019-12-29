@@ -6,6 +6,8 @@ import qualified Data.Set as Set
 import Geometry
 import System.IO
 import System.Random
+import Control.Applicative
+import Data.Monoid
 
 data Point = Point Float Float deriving (Show)
 data Shape = Circle Point Float | Rectangle Point Point deriving (Show)
@@ -37,6 +39,11 @@ data Tree a = EmptyTree | Node a (Tree a) (Tree a) deriving (Show, Read, Eq)
 instance Functor Tree where
     fmap f EmptyTree = EmptyTree
     fmap f (Node x leftsub rightsub) = Node (f x) (fmap f leftsub) (fmap f rightsub)
+instance Foldable Tree where
+    foldMap f EmptyTree = mempty
+    foldMap f (Node x l r) = foldMap f l `mappend`
+                             f x         `mappend`
+                             foldMap f r
 
 data TrafficLight = Red | Yellow | Green
 instance Eq TrafficLight where
@@ -543,4 +550,28 @@ solveRPN = head . foldl foldFx [] . words
             foldFx (x:xs) "ln" = log x:xs
             foldFx xs "sum" = [sum xs]
             foldFx xs item = read item:xs
+
+sequenceA' :: (Applicative f) => [f a] -> f [a]
+-- sequenceA' [] = pure []
+-- sequenceA' (x:xs) = (:) <$> x <*> sequenceA' xs
+sequenceA' = foldr (liftA2 (:)) (pure [])
+
+newtype CharList = CharList { getCharList :: [Char] } deriving (Eq, Show)
+
+newtype Pair b a = Pair { getPair :: (a,b) }
+
+instance Functor (Pair c) where
+    fmap f (Pair (x,y)) = Pair (f x, y)
+
+-- data CoolBool = CoolBool { getCoolBool :: Bool }
+newtype CoolBool = CoolBool { getCoolBool :: Bool }
+
+helloMe :: CoolBool -> String
+helloMe (CoolBool _) = "hello"
+
+lengthCompare :: String -> String -> Ordering
+-- lengthCompare x y = let a = compare (length x) (length y)
+--                         b = compare x y
+--                     in  if a == EQ then b else a
+lengthCompare x y = mappend (compare (length x) (length y)) (compare x y)
 
