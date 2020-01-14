@@ -8,6 +8,7 @@ import System.IO
 import System.Random
 import Control.Applicative
 import Data.Monoid
+import Control.Monad
 
 data Point = Point Float Float deriving (Show)
 data Shape = Circle Point Float | Rectangle Point Point deriving (Show)
@@ -598,4 +599,50 @@ x -: f = f x
 
 banana :: Pole -> Maybe Pole
 banana _ = Nothing
+
+routine :: Maybe Pole
+routine = do
+    start <- return (0,0)
+    first <- landLeft 2 start
+    Nothing
+    second <- landRight 2 first
+    landLeft 1 second
+
+justH :: Maybe Char
+justH = do
+    (x:xs) <- Just "hello"
+    return x
+
+wopwop :: Maybe Char
+wopwop = do
+    (x:xs) <- Just ""
+    return x
+
+listOfTuples :: [(Int,Char)]
+listOfTuples = do
+    n <- [1,2]
+    ch <- ['a','b']
+    return (n,ch)
+
+sevensOnly :: [Int]
+sevensOnly = do
+    x <- [1..50]
+    guard ('7' `elem` show x)
+    return x
+
+type KnightPos = (Int,Int)
+
+moveKnight :: KnightPos -> [KnightPos]
+moveKnight (c,r) = do
+    (c',r') <- [(c+2,r-1),(c+2,r+1),(c-2,r-1),(c-2,r+1)
+               ,(c+1,r-2),(c+1,r+2),(c-1,r-2),(c-1,r+2)
+               ]
+    guard (c' `elem` [1..8] && r' `elem` [1..8])
+    return (c',r')
+
+in3 :: KnightPos -> [KnightPos]
+in3 start = return start >>= moveKnight >>= moveKnight >>= moveKnight
+
+canReachIn3 :: KnightPos -> KnightPos -> Bool
+canReachIn3 start end = end `elem` in3 start
 
