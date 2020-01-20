@@ -11,6 +11,7 @@ import System.Random
 import Control.Applicative
 import Data.Monoid
 import Control.Monad
+import Control.Monad.Writer
 
 data Point = Point Float Float deriving (Show)
 data Shape = Circle Point Float | Rectangle Point Point deriving (Show)
@@ -176,11 +177,11 @@ tail' :: [a] -> [a]
 tail' [] = []
 tail' (_:xs) = xs
 
-tell :: (Show a) => [a] -> String
-tell [] = "The list is empty"
-tell (x:[]) = "The list has one element: " ++ show x
-tell (x:y:[]) = "The list has two elements: " ++ show x ++ " and " ++ show y
-tell (x:y:_) = "This list is long. The first two elements are: " ++ show x ++ " and " ++ show y
+tell' :: (Show a) => [a] -> String
+tell' [] = "The list is empty"
+tell' (x:[]) = "The list has one element: " ++ show x
+tell' (x:y:[]) = "The list has two elements: " ++ show x ++ " and " ++ show y
+tell' (x:y:_) = "This list is long. The first two elements are: " ++ show x ++ " and " ++ show y
 
 length'' :: (Num b) => [a] -> b
 length'' [] = 0
@@ -665,4 +666,59 @@ addDrink "beans" = ("milk", Sum 25)
 addDrink "jerky" = ("whiskey", Sum 99)
 addDrink _ = ("beer", Sum 30)
 
+logNumber :: Int -> Writer [String] Int
+logNumber x = writer (x, ["Got number: " ++ show x])
 
+multWithLog :: Writer [String] Int
+multWithLog = do
+    a <- logNumber 3
+    b <- logNumber 5
+    tell ["multiplying..."]
+    return (a*b)
+
+gcd' :: Int -> Int -> Writer [String] Int
+gcd' a b
+    | b == 0    = do
+        tell ["result: " ++ show a]
+        return a
+    | otherwise = do
+        tell [show a ++ " mod " ++ show b ++ " = " ++ show (a `mod` b)]
+        gcd' b (a `mod` b)
+
+newtype DiffList a = DiffList {getDiffList :: [a] -> [a]}
+
+toDiffList :: [a] -> DiffList a
+toDiffList xs = DiffList (xs++)
+
+fromDiffList :: DiffList a -> [a]
+fromDiffList (DiffList f) = f []
+
+instance Semigroup (DiffList a) where
+    (DiffList f) <> (DiffList g) = DiffList (f . g)
+
+instance Monoid (DiffList a) where
+    mempty = DiffList (id)
+
+gcdReverse :: Int -> Int -> Writer (DiffList String) Int
+gcdReverse a b
+    | b == 0 = do
+        tell (toDiffList ["result: " ++ show a])
+        return a
+    | otherwise = do
+        result <- gcdReverse b (a `mod` b)
+        tell (toDiffList [show a ++ " mod " ++ show b ++ " = " ++ show (a `mod` b)])
+        return result
+
+finalCountDown :: Int -> Writer (DiffList String) ()
+finalCountDown 0 = do
+    tell (toDiffList ["0"])
+finalCountDown x = do
+    finalCountDown (x-1)
+    tell (toDiffList [show x])
+
+slowCountDown :: Int -> Writer [String] ()
+slowCountDown 0 = do
+    tell ["0"]
+slowCountDown x = do
+    slowCountDown (x-1)
+    tell [show x]
