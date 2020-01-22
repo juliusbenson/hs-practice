@@ -46,9 +46,28 @@ pack (x:xs) = if x == head xs
     then (x:(head (pack xs))):(tail (pack xs))
     else [x]:(pack xs)
 
--- pack (x:xs) = let (first,rest) = span (==x) xs
---                in (x:first) : pack rest
+-- pack (x:xs) = (x:takeWhile (==x) xs):pack (dropWhile (==x) xs)
 
 encode :: (Eq a) => [a] -> [(Int,a)]
-encode x = zip (map (length) (pack x)) (compress x)
+encode xs = zip (map (length) (pack xs)) (compress xs)
+
+data RunLength a = Single a | Multiple Int a deriving (Show)
+
+encodeModified :: (Eq a) => [a] -> [RunLength a]
+encodeModified []     = []
+encodeModified (x:xs) = if (takeWhile (==x) xs) == []
+    then (Single x):encodeModified xs
+    else (Multiple (length (takeWhile (==x) xs)) x):encodeModified (dropWhile (==x) xs)
+
+decodeModified :: [RunLength a] -> [a]
+decodeModified [] = []
+decodeModified (Single a:xs) = [a] ++ decodeModified xs
+decodeModified (Multiple n a:xs) = (take n (repeat a)) ++ decodeModified xs
+
+encodeDirect :: (Eq a) => [a] -> [RunLength a]
+encodeDirect = encodeModified
+
+dupli :: [a] -> [a]
+dupli [] = []
+dupli (x:xs) = x:x:dupli xs
 
