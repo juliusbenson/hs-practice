@@ -71,3 +71,40 @@ dupli :: [a] -> [a]
 dupli [] = []
 dupli (x:xs) = x:x:dupli xs
 
+repli :: [a] -> Int -> [a]
+repli [] _ = []
+repli (x:xs) n = take n (repeat x) ++ repli xs n
+
+drop' :: [a] -> Int -> [a]
+drop' [] _ = []
+drop' xs n = if 0 == mod (length xs) n
+    then (drop' (init xs) n)
+    else (drop' (init xs) n) ++ (last xs):[]
+
+split :: [a] -> Int -> ([a],[a])
+split (_:xs) 0 = ([],xs)
+split (x:xs) n = let (t,u) = split xs (n-1)
+    in (x:t,u)
+
+slice :: [a] -> Int -> Int -> [a]
+slice (x:_)  _ 1 = x:[]
+slice (x:xs) 1 m = x:(slice xs 1 (m-1))
+slice (_:xs) n m = (slice xs (n-1) (m-1))
+
+rotL :: [a] -> [a]
+rotL (x:xs) = xs ++ [x]
+
+rotR :: [a] -> [a]
+rotR xs = (last xs):(init xs)
+
+rotate :: [a] -> Int -> [a]
+rotate xs 0 = xs
+rotate xs n = if n >= 0
+    then rotate (rotL xs) (n-1)
+    else rotate (rotR xs) (n+1)
+
+removeAt :: Int -> [a] -> (a,[a])
+removeAt 1 (x:xs) = (x,xs)
+removeAt n (x:xs) = let (t,u) = removeAt (n-1) xs
+    in (t,x:u)
+
