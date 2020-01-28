@@ -1,3 +1,7 @@
+module H99 where
+
+import System.Random as R
+
 myLast :: (Eq a) => [a] -> a
 myLast (x:[]) = x
 myLast (_:xs) = myLast xs
@@ -81,9 +85,9 @@ drop' xs n = if 0 == mod (length xs) n
     then (drop' (init xs) n)
     else (drop' (init xs) n) ++ (last xs):[]
 
-split :: [a] -> Int -> ([a],[a])
-split (_:xs) 0 = ([],xs)
-split (x:xs) n = let (t,u) = split xs (n-1)
+split' :: [a] -> Int -> ([a],[a])
+split' (_:xs) 0 = ([],xs)
+split' (x:xs) n = let (t,u) = split' xs (n-1)
     in (x:t,u)
 
 slice :: [a] -> Int -> Int -> [a]
@@ -107,4 +111,49 @@ removeAt :: Int -> [a] -> (a,[a])
 removeAt 1 (x:xs) = (x,xs)
 removeAt n (x:xs) = let (t,u) = removeAt (n-1) xs
     in (t,x:u)
+
+removeAt' :: Int -> [a] -> (a,[a])
+removeAt' 0 (x:xs) = (x,xs)
+removeAt' n (x:xs) = let (t,u) = removeAt' (n-1) xs
+    in (t,x:u)
+
+insertAt :: a -> [a] -> Int -> [a]
+insertAt x ys 1 = x:ys
+insertAt x (y:ys) n = y:(insertAt x ys (n-1))
+
+range :: Int -> Int -> [Int]
+range n m = if n == m
+    then n:[]
+    else n:(range (n+1) m)
+
+rnd_select :: [a] -> Int -> IO [a]
+rnd_select xs n = do
+    gen <- getStdGen
+    return (take n (rands xs gen))
+
+rands :: [a] -> StdGen -> [a]
+rands xs gen = let (i, newGen) = (random gen :: (Int,StdGen))
+    in (xs!!(mod i (length xs))):(rands xs newGen)
+
+diff_select :: Int -> Int -> IO [Int]
+diff_select n m = rnd_select [1..m] n
+
+rnd_permu :: [a] -> IO [a]
+rnd_permu xs = do
+    gen <- getStdGen
+    return (permu xs gen)
+
+permu :: [a] -> StdGen -> [a]
+permu [] _ = []
+permu xs gen =
+    let (i, newGen) = (random gen :: (Int,StdGen))
+        (t,remaining) = removeAt' (mod i (length xs)) xs
+    in t:(permu remaining newGen)
+
+-- combinations :: Int -> [a] -> [[a]]
+-- combinations 0 _ = [[]]
+-- combinations n xs = do
+--     i <- [0..(length xs)-1]
+--     x <- combinations (n-1) (drop (i+1) xs)
+--     return (xs !! i : x)
 
