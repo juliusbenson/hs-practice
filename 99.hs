@@ -152,30 +152,9 @@ permu xs gen =
 
 -- unoriginal code
 combinations :: Int -> [a] -> [[a]]
-combinations 0 _ = [[]]
-combinations n xs = do
-    i <- [0..(length xs)-1]
-    x <- combinations (n-1) (drop (i+1) xs)
-    return (xs !! i : x)
--- original code
-
-combinations' :: Int -> [a] -> [([a],[a])]
-combinations' 0 _ = [([],[])]
-combinations' n xs = do
-    i     <- [0..(length xs)-1]
-    (x,t) <- combinations' (n-1) (drop (i+1) xs)
-    return (xs !! i : x, take (i+1) xs)
-
-group :: [Int] -> [String] -> [[[String]]]
-group [] _ = [[]]
-group (n:ns) xs = do
-    (x,remaining) <- combinations' n xs
-    y <- group ns remaining
-    return (x:y)
-
-group = do
-    subset <- 
-    disjointsubset <-
-    setofdisjointsubsets <- 
-    return setofdisjointsubsets
+combinations _ [] = [[]]
+combinations 0 _  = [[]]
+combinations k (x:xs) = x_start ++ others
+    where x_start = [ x : rest | rest <- combinations (k-1) xs ]
+          others  = if k <= length xs then combinations k xs else []
 
