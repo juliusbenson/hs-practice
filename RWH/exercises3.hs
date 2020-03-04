@@ -57,13 +57,29 @@ directions _ = []
 
 -- 12.Using the code from the preceding three exercises, implement Graham's scan algorithm for the convex hull of a set of 2D points. You can find good description of what a convex hull. is, and how the Graham scan algorithm should work, on Wikipedia.
 
--- graham xs = 
+sortSlopes xs = sortSlopesOn bottomLeft remaining
+    where bottomLeft = (head (leftMost (bottomMost xs)))
+          remaining = delete bottomLeft xs
 
-sortSlopes _ [] = []
-sortSlopes p (t:ts) = (sortSlopes p left) ++ [t] ++ (sortSlopes p right)
+sortSlopesOn _ [] = []
+sortSlopesOn p (t:ts) = (sortSlopesOn p left) ++ [t] ++ (sortSlopesOn p right)
     where left  = filter (\l -> (slope p l) <= (slope p t)) ts
           right = filter (\r -> (slope p r) > (slope p t)) ts
 
 slope (x0,y0) (x,y) = (y-y0)/(x-x0)
 
 leftMost xs = filter (\t -> (fst t) == (minimum (map (fst) xs))) xs
+
+bottomMost xs = filter (\t -> (snd t) == (minimum (map (snd) xs))) xs
+
+-- now once we've sorted the slopes, we have to go through in order and find the direction.
+-- if it's a right turn, we discard the middle and try again. (recursive call w/o 2nd)
+-- if it's left, we move on to the next
+
+graham xs = bottomLeft:(unsortedGraham (sortSlopes xs))
+    where bottomLeft = (head (leftMost (bottomMost xs)))
+
+unsortedGraham (a:b:[]) = a:b:[]
+unsortedGraham (a:b:xs) = case (direction a b (head xs)) of
+    RightTurn -> unsortedGraham (a:xs)
+    otherwise -> a:(unsortedGraham (b:xs))
