@@ -57,14 +57,14 @@ directions _ = []
 
 -- 12.Using the code from the preceding three exercises, implement Graham's scan algorithm for the convex hull of a set of 2D points. You can find good description of what a convex hull. is, and how the Graham scan algorithm should work, on Wikipedia.
 
-sortSlopes xs = sortSlopesOn bottomLeft remaining
+sortSlopes xs = sortBy (compare `on` slope bottomLeft) remaining
     where bottomLeft = (head (leftMost (bottomMost xs)))
           remaining = delete bottomLeft xs
 
-sortSlopesOn _ [] = []
-sortSlopesOn p (t:ts) = (sortSlopesOn p left) ++ [t] ++ (sortSlopesOn p right)
-    where left  = filter (\l -> (slope p l) <= (slope p t)) ts
-          right = filter (\r -> (slope p r) > (slope p t)) ts
+-- sortSlopesOn _ [] = []
+-- sortSlopesOn p (t:ts) = (sortSlopesOn p left) ++ [t] ++ (sortSlopesOn p right)
+--     where left  = filter (\l -> (slope p l) <= (slope p t)) ts
+--           right = filter (\r -> (slope p r) > (slope p t)) ts
 
 slope (x0,y0) (x,y) = (y-y0)/(x-x0)
 
