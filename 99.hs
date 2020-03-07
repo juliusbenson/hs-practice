@@ -149,12 +149,3 @@ permu xs gen =
     let (i, newGen) = (random gen :: (Int,StdGen))
         (t,remaining) = removeAt' (mod i (length xs)) xs
     in t:(permu remaining newGen)
-
--- unoriginal code
-combinations :: Int -> [a] -> [[a]]
-combinations _ [] = [[]]
-combinations 0 _  = [[]]
-combinations k (x:xs) = x_start ++ others
-    where x_start = [ x : rest | rest <- combinations (k-1) xs ]
-          others  = if k <= length xs then combinations k xs else []
-
