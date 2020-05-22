@@ -1,7 +1,5 @@
 {-# LANGUAGE BangPatterns #-}
 
-module CodeWars where
-
 findOdd :: [Int] -> Int
 findOdd (x:xs) = if even (length (filter (x==) xs))
                   then x
@@ -30,3 +28,16 @@ rowSumOddNumbers r = sum $ take (fromIntegral r) [n,m..]
   where n = r * (r-1) + 1
         m = r * (r-1) + 3
 
+humanReadable :: Int -> String
+humanReadable x =
+    show' (div x (60*60)) ++ ":" ++
+    show' (div (mod x (60*60)) 60) ++ ":" ++
+    show' (mod (mod x (60*60)) 60)
+
+show' n = if n < 10 then "0" ++ show n else show n
+
+unsum :: Int -> [Int]
+unsum n = mag * d :unsum m
+    where
+        mag = 10 ^ floor (logBase 10 n)
+        (d, m) = divMod n mag
