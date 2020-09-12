@@ -1,6 +1,6 @@
 {-# LANGUAGE BangPatterns #-}
 
-import Data.List (nub, (\\), sortBy, isPrefixOf)
+import Data.List (nub, (\\), sortBy, isPrefixOf, sort)
 import Data.Char
 import Data.Ord
 
@@ -227,3 +227,37 @@ delete' _ _ = []
 
 nub' (x:xs) = x : (nub' $ filter (/=x) xs)
 nub' _ = []
+
+-- countChange :: Integer -> [Integer] -> Integer
+-- countChange a cs = change a leastN cs
+--     where leastN = a `div` head (sort cs)
+
+-- change _ 0 _  = 0
+-- change a n cs = count ((==a) . sum) (combs n cs) + change a (n-1) cs
+
+-- combs n cs = mapM (const cs) [1..n]
+
+-- count :: ([a] -> Bool) -> [[a]] -> Integer
+-- count _ [] = 0
+-- count f (x:xs) = (if f x then 1 else 0) + count f xs
+
+-- example = mapM (take <$> [1..3]) (map (repeat) [2,3,5])
+
+-- length $ filter (==10) $ map (sum) $ traverse (const [0,2,3,5]) [1..10]
+
+-- combs [] = []
+-- combs xs = [ y:ys | y <- xs, ys <- combs xs ]
+
+countChange :: Integer -> [Integer] -> Integer
+countChange n xs = undefined
+
+-- combos :: Int -> [[Int]]
+-- combos n = [x:ys | x <- [1..n], ys <- combos (n - x)]
+
+parseFloat :: String -> Maybe Float
+parseFloat "1" = Just 1.0
+parseFloat s = Nothing
+
+factorial :: Integer -> Integer
+factorial 0 = 1
+factorial n = n * factorial (n-1)
