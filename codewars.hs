@@ -1,6 +1,6 @@
 {-# LANGUAGE BangPatterns #-}
 
-import Data.List (nub, (\\), sortBy, isPrefixOf, sort)
+import Data.List (nub, (\\), sortBy, isPrefixOf, sort, permutations)
 import Data.Char
 import Data.Ord
 
@@ -261,3 +261,6 @@ parseFloat s = Nothing
 factorial :: Integer -> Integer
 factorial 0 = 1
 factorial n = n * factorial (n-1)
+
+nextBigger :: Int -> Int
+nextBigger x = minimum $ filter (> x) $ map read $ permutations $ show x
