@@ -20,4 +20,4 @@ prime0 n    | n < 1     = error "not a positive integer"
 -- not very safe, uses !!, prone to run out of bounds
 sieve x i = (x \\ (map (*(x !! i)) x))
 
-sub100 = foldl (sieve) [2..100] [1..25] -- for example
+sub100 = foldl (sieve) [2..100] [0..24] -- for example
