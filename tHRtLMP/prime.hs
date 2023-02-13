@@ -67,3 +67,34 @@ substring :: String -> String -> Bool
 substring [] [] = True
 substring _ [] = False
 substring xs ys@(_:ys') = prefix xs ys || substring xs ys'
+
+factors :: Integer -> [Integer]
+factors n
+    | n < 1 = error "cannot factor a number less than 1"
+    | n == 1 = []
+    | otherwise = p : factors (div n p)
+    where p = ld n
+
+map' :: (a -> b) -> [a] -> [b]
+map' _ [] = []
+map' f (x:xs) = (f x) : (map f xs)
+
+--1.20
+lengths :: Foldable t => [t a] -> [Int]
+lengths = map length
+
+--1.21
+sumLengths :: Foldable t => [t a] -> Int
+sumLengths = sum . lengths
+
+--1.24
+
+--experimenting for fun
+
+ldpf :: [Integer] -> Integer -> Integer
+ldpf (p:ps) n | rem n p == 0 = p 
+              | p^2 > n      = n
+              | otherwise    = ldpf ps n
+
+primes1 :: [Integer]
+primes1 = 2 : filter (\n -> ldpf primes1 n == n) [3..]
